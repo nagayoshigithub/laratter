@@ -9,10 +9,12 @@ class TweetController extends Controller
 {
   public function index()
   {
-    // 🔽 追加
-    $tweets = Tweet::with('user')->latest()->get();
+    // 🔽 liked のデータも合わせて取得するよう修正
+    $tweets = Tweet::with(['user', 'liked'])->latest()->get();
+    // dd($tweets);
     return view('tweets.index', compact('tweets'));
   }
+
 
   public function create()
   {
@@ -39,6 +41,7 @@ class TweetController extends Controller
      */
     public function show(Tweet $tweet)
     {
+      $tweet->load('comments');
       return view('tweets.show', compact('tweet'));
     }
 
