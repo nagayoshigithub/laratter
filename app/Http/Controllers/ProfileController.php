@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\User;
+use App\Models\Tweet;
+
 
 class ProfileController extends Controller
 {
@@ -57,4 +60,44 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+  public function show(User $user)
+  {
+    if (auth()->user()->is($user)) {
+      $tweets = Tweet::query()
+        ->where('user_id', $user->id)  // 自分のツイート
+        ->orWhereIn('user_id', $user->follows->pluck('id')) // フォローしているユーザーのツイート
+        ->latest()
+        ->paginate(10);
+    } else {
+      // 他のユーザーの場合、そのユーザーのツイートのみを取得
+      $tweets = $user
+        ->tweets()
+        ->latest()
+        ->paginate(10);
+    }
+
+    // ユーザーのフォロワーとフォローしているユーザーを取得
+    $user->load(['follows', 'followers']);
+
+    return view('profile.show', compact('user', 'tweets'));
+  }
+  public function search(Request $request)
+  {
+
+  $query = User::query();
+
+  // キーワードが指定されている場合のみ検索を実行
+  if ($request->filled('keyword')) {
+    $keyword = $request->keyword;
+    $query->where('user', 'like', '%' . $keyword . '%');
+  }
+
+  // ページネーションを追加（1ページに10件表示）
+  $users = $query
+    ->latest()
+    ->paginate(10);
+
+  return view('user.search', compact('users'));
+  }
 }
