@@ -15,7 +15,7 @@ Userの検索画面をTweetの検索と似たようなやり方で作り、User�
 DEC課題１.mp4
 ## 使い方
 
-1. header部分のUser検索をクリック
+1. navigation部分のUser検索をクリック
 
 2. 調べたいUserの名前を入力欄に記入し、Searchボタンを押す
 
